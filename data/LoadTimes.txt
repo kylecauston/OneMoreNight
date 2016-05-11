@@ -1,0 +1,1 @@
+34.0,Assets:633.6177,Title Screen:25.117647,Items:123.52941,Recipes:3.2058823,Outside:61.588234,Safezones:1.1470587,Entity filling:7.4411764,Player setup:0.88235295,Story and Journal:9.6470585
