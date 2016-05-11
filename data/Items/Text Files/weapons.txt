@@ -1,0 +1,10 @@
+~~~ Name, damage, range, cooldown (in s), knockback(in p), loud?, ranged?, shot type (0-straight, 1-spread, 2-throw), if type1: spread angle; if type2: radius of damage ~~~
+Bat,95,50,1,75,f,f,0
+Police Baton,80,30,0.25,25,f,f,0
+Crowbar,105,50,1,50,f,f,0
+Machete,110,50,0.75,30,f,f,0
+Shotgun,11,100,2,50,t,t,1,45
+Pistol,100,400,1,100,t,t,0
+Spiked Bat,120,50,1,30,f,f,0
+Dual Pistols,100,100,0.5,100,t,t,0
+Grenade,50,150,1,100,f,f,2,50

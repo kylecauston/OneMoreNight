@@ -1,0 +1,2 @@
+~ name, item gained on harvest, days until maturity, action 0, action 1 ... action(daysToMaturity-1) ~
+Bush,Dried Fruit,3,Plant,Water,Water

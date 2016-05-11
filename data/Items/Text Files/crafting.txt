@@ -1,0 +1,7 @@
+Bat,Nails,Spiked Bat
+Pain Pills,Strong Pills,Gauze,First-Aid Kit
+Cloth,Alcohol,Gauze
+Pain Pills,Pain Pills,Strong Pills
+Pistol,Pistol,Dual Pistols
+Planks,Nails,Barricade
+Planks,Planks,Supports
