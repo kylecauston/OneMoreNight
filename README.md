@@ -10,4 +10,10 @@ While doing the work throughout school, there was a lot of focus on keeping the 
 
 ## Text files
 
-Most of the content is loaded in through text files (all items, maps, tiles, lore etc) so that content could be very easily added. All the item types (consumable, lore, weapons, etc) have their own files and loading methods. The maps are saved so that their strings correspond to the type of map they are (for example, the 2nd variant of a House (building type 1), entered while walking down (entrance is at the top) would have the name of map1D-2.txt, as the string is map[Building Type][direction]-[variant].txt). The tiles in the map are abstracted out to presets (combinations of solid, container and transparent booleans)
+Most of the content is loaded in through text files (all items, maps, tiles, lore etc) so that content could be very easily added. All the item types (consumable, lore, weapons, etc) have their own files and loading methods.
+
+The maps are saved so that their strings correspond to the type of map they are (for example, the 2nd variant of a House (building type 1), entered while walking down (entrance is at the top) would have the name of map1D-2.txt, as the string is map[Building Type][direction]-[variant].txt). The tiles in the map are abstracted out to presets (combinations of solid, container and transparent booleans), and then those presets are numbered. The maps are then constructed by using the presets, with occasionally decimals (eg 4.5) where the decimal part is the variant of the tile (for tiles like grass, where there could be a few different grass tiles).
+
+## NPC's
+
+All entities inherit from one base class - Person. From Person you have Player and NPC. NPC splits into Zombie and Survivor, and then Survivor splits into it's own children classes. NPC's all have their own finite state machines (and can call the parent's state machine, for example a citizen might act the same as a merchant, but they're different classes for other reasons), and the states are saved as Behaviors, which dictate how an NPC moves and interacts with the environment.
