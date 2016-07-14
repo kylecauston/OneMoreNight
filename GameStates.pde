@@ -208,7 +208,7 @@ class Play extends Gamestate {
     case '.':
       you.getItem(nameToID("Planks"));
       you.getItem(nameToID("Music Player"));
-    //  countdown = 0;
+      //  countdown = 0;
       break;
     case 'p':
       prevstate = state;
@@ -359,7 +359,7 @@ class Play extends Gamestate {
       int range = you.getRange();
       mouse.set(mouseX, mouseY);
       mouse.sub(TRANS);
-      if(you.flashTimer > 0) {
+      if (you.flashTimer > 0) {
         you.showMuzzleFlash();
       }
     }
@@ -392,7 +392,7 @@ class Debug extends Play {
   int behaviorCounter = 0;
   NPC highlighted;
 
-  boolean visionCones, enemyLine, pathLines, stateDisplay, tileInfo, entitySpawn, mapInfo, safezoneDisplay, highlightedInfo;
+  boolean visionCones, enemyLine, pathLines =true, stateDisplay, tileInfo, entitySpawn, mapInfo, safezoneDisplay=true, highlightedInfo;
 
   Debug() {
     mouseCoords = new PVector();
@@ -509,10 +509,13 @@ class Debug extends Play {
         noFill();
         rectMode(CORNER);
         Safezone zone = closestSafezone(you);  // only displays the closest safezone
+
         stroke(#FF0015);
         for (Tile tile : zone.openings) rect(tile.pos.x, tile.pos.y, tSize, tSize); // openings
+
         stroke(#11F0DB);
         for (Tile tile : zone.spots) rect(tile.pos.x, tile.pos.y, tSize, tSize);  // safe zone
+        //
         stroke(#0008FF);
         //     rect(zone.topLeft, zone.bottomRight);  // outlining the safezone
         ellipse(zone.centerpoint.x, zone.centerpoint.y, 10, 10);   // centerpoint display
@@ -660,7 +663,6 @@ class Debug extends Play {
       text("Frame Rate: " + nf(frameRate, 0, 0), mapWindow.x+5, mapWindow.y + 70);
     }
 
-    entitySpawn = true;
     if (entitySpawn) {
       // spawn window
       PVector window = new PVector(250, 5); 
@@ -681,6 +683,29 @@ class Debug extends Play {
 
       textAlign(LEFT, TOP);
       text("Speed: " + text, window.x+5, window.y+25);
+    }
+
+    if (safezoneDisplay) {
+      PVector safeZoneWindow = new PVector(width - 300, 5); 
+      int wHeight = 100; 
+      int wWidth = 150; 
+
+      rectMode(CORNER); 
+      fill(#FFFFFF, 75); 
+      strokeWeight(2); 
+      stroke(#000000); 
+      rect(safeZoneWindow.x, safeZoneWindow.y, wWidth, wHeight); 
+
+      fill(#000000); 
+      textAlign(CENTER, TOP); 
+      text("Safezone", safeZoneWindow.x+wWidth/2, safeZoneWindow.y+5);
+
+      Safezone zone = closestSafezone(you);  // only displays the closest safezone
+
+      textAlign(LEFT, TOP);
+      text("Survivor Count: " + zone.survivors.size(), safeZoneWindow.x+5, safeZoneWindow.y+25);
+      text("Guards on Duty: " + zone.numGuards, safeZoneWindow.x+5, safeZoneWindow.y+40);
+      text("Need Guard? " + zone.needsGuard(), safeZoneWindow.x+5, safeZoneWindow.y+55);
     }
 
     popStyle();

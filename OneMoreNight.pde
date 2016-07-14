@@ -152,16 +152,16 @@ void setup() {
   current.readTile();
   loadTime("Outside");
 
-  // load safezones
-  loadSafezones();
-  loadTime("Safezones");
-
   // initalize behaviors
   wander = new Wander();
   chase = new Chase();
   totarg = new GoTo();
   wait = new Wait();
   flee = new Flee();
+
+  // load safezones
+  loadSafezones();
+  loadTime("Safezones");
 
   // load and fill with entities
   //current.fillWithZombies(1);

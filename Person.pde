@@ -441,6 +441,7 @@ abstract class NPC extends Person {
     currentTarget = 0;
     target = new PVector[1];
     target[0] = t.get();
+     
     setBehavior(totarg);
   }
 
@@ -458,7 +459,7 @@ abstract class NPC extends Person {
         knockbackDistance = max(knockbackDistance - knockbackVel.mag(), 0);
       }
 
-      if (target != null && pos.dist(target[currentTarget]) < size/2) {  // arrived at target
+      if (target != null && pos.dist(target[currentTarget]) < size/4) {  // arrived at target
         if (currentTarget < target.length-1) {  // there's another target available
           currentTarget++;
           updateVel();
@@ -474,6 +475,14 @@ abstract class NPC extends Person {
       behavior.update(this);
     } else { // dead
       // stop sound from playing
+
+      // tell their safezone they've died, janky fix
+      if(this instanceof Survivor) {
+        Survivor s = (Survivor)this;
+        if(s.territory != null) {  // they're from a safezone
+          s.territory.registerDeath(s);
+        }
+      }
 
       // remove self from the list that they are in
       list.remove(this);
@@ -514,6 +523,7 @@ abstract class NPC extends Person {
     vel.set(target[currentTarget].x - pos.x, target[currentTarget].y - pos.y);
     vel.normalize();
     vel.setMag(speed);
+    
   }
 
   void knockedBack(Person hitter) {
@@ -597,7 +607,7 @@ class Zombie extends NPC {
     whichBuilding = buildingID;
 
     regularSpeed = speed;
-    speed = min(1, regularSpeed);
+    speed = regularSpeed/2;
 
     genValidCoords();
 
@@ -643,6 +653,7 @@ class Zombie extends NPC {
 
 abstract class Survivor extends NPC {
   Safezone territory;
+  boolean guarding;
 
   Survivor(int buildingID, ArrayList<Survivor> list) {
     super(list);
@@ -663,8 +674,10 @@ abstract class Survivor extends NPC {
     speed = 1;
 
     genValidCoords();
+    
+    guarding = false;
 
-    behavior = wander;
+    behavior = wait;
     behavior.newTarget(this);
   }
 
@@ -682,6 +695,11 @@ abstract class Survivor extends NPC {
   }
 
   void update() {
+        
+    if(territory != null && !guarding && territory.needsGuard()) {
+      territory.acceptGuard(this);
+    }
+    
     super.update();
   }
 

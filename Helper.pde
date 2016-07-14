@@ -53,35 +53,37 @@ static class GridMath {
     int endCol = floor(finish.x/size);
     int endRow = floor(finish.y/size);
 
-    if(startCol < 0 || startRow < 0 || endCol < 0 || endRow < 0) {
+    // ensure the start and end are in bounds
+    if (startCol < 0 || startRow < 0 || endCol < 0 || endRow < 0
+      || startCol >= numCols || startRow >= numRows  
+      || endCol >= numCols || endRow >= numRows) {
       println("Target is out of bounds.");
       return null;
     }
 
-    if (!grid[endCol][endRow].solid) {
-
-
-      ArrayList<GridTile> path = new ArrayList<GridTile>();
-      dfs_recursive(startRow, startCol, grid[endCol][endRow], grid, path, numRows, numCols);
-
-      ArrayList<PVector> locations = new ArrayList<PVector>();
-      PVector center;
-      for (GridTile temp : path) {
-        temp.tagged = false;
-
-        center = temp.pos.get();
-        center.set(center.x + temp.size/2, center.y + temp.size/2);
-        locations.add(center);
-      }
-
-      PVector[] array = new PVector[locations.size()];
-      array = locations.toArray(array);
-
-      return array;
-    } else {
+    // don't keep going if it's a solid tile
+    if (grid[endCol][endRow].solid) {
       println("Target is in solid tile, could not reach.");
       return null;
     }
+    
+    ArrayList<GridTile> path = new ArrayList<GridTile>();
+    dfs_recursive(startRow, startCol, grid[endCol][endRow], grid, path, numRows, numCols);
+
+    ArrayList<PVector> locations = new ArrayList<PVector>();
+    PVector center;
+    for (GridTile temp : path) {
+      temp.tagged = false;
+
+      center = temp.pos.get();
+      center.set(center.x + temp.size/2, center.y + temp.size/2);
+      locations.add(center);
+    }
+
+    PVector[] array = new PVector[locations.size()];
+    array = locations.toArray(array);
+
+    return array;
   }
 
   static private boolean dfs_recursive(int r, int c, GridTile target, GridTile[][] grid, ArrayList<GridTile> path, int numRows, int numCols) {
@@ -164,7 +166,7 @@ static class GridMath {
   }
 
   static PVector[] pathShortener(PVector[] path, GridTile[][] grid) {   // private?
-    if (path == null || path.length > 0) {
+    if (path != null && path.length > 0) {
       boolean found = false;
       int spot = 0;
       PVector current = path[0];

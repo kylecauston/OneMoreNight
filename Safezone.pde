@@ -4,7 +4,9 @@ ArrayList<Safezone> safezones;  // list of safe areas to spawn in
 class Safezone {
   Tile[] spots;
   Tile[] openings;
-  boolean[] guarded;
+  Survivor[] guards;  // flag to tell survivors to try guarding
+  int numGuards;
+
   PVector centerpoint;
   PVector topLeft, bottomRight;
   ArrayList<Survivor> survivors;
@@ -19,7 +21,10 @@ class Safezone {
     spots = currentZone.toArray(spots);
     openings = new Tile[currentOpenings.size()];
     openings = currentOpenings.toArray(openings);
-    guarded = new boolean[currentOpenings.size()];
+    guards = new Survivor[currentOpenings.size()];
+    for (int i=0; i<guards.length; i++) guards[i] = null;
+
+    numGuards = 0;
 
     calcCenter();
 
@@ -47,35 +52,74 @@ class Safezone {
 
   private boolean modifiedFloodFill(int r, int c, ArrayList<GridTile> currentZone, ArrayList<GridTile> currentOpenings) {
     // recursive flood fill, keeps track of safe tiles + "openings" (non solid, non safe, connected tiles)
-    if (c>=0 && r>=0 && c<current.cols && r<current.rows && !current.map[c][r].solid && !current.map[c][r].tagged) {
-      Tile tile = current.map[c][r]; 
-      tile.tagged = true; 
-      if (tile.safe) {
-        currentZone.add(tile); 
-        modifiedFloodFill(r+1, c, currentZone, currentOpenings); 
-        modifiedFloodFill(r-1, c, currentZone, currentOpenings); 
-        modifiedFloodFill(r, c+1, currentZone, currentOpenings); 
-        modifiedFloodFill(r, c-1, currentZone, currentOpenings); 
-        return true;
-      } else {  // not safe, and not solid
-        currentOpenings.add(tile); 
-        return false;
-      }
-    } else {
+
+    // bounds checking
+    if (c<0 || r<0 || c>=current.cols || r>=current.rows || current.map[c][r].solid || current.map[c][r].tagged) {
       return false;
     }
+
+    Tile tile = current.map[c][r]; 
+    tile.tagged = true; 
+
+    // if it's not a safe tile, don't keep expanding
+    if (!tile.safe) {
+      currentOpenings.add(tile); 
+      return false;
+    }
+
+    currentZone.add(tile); 
+    modifiedFloodFill(r+1, c, currentZone, currentOpenings); 
+    modifiedFloodFill(r-1, c, currentZone, currentOpenings); 
+    modifiedFloodFill(r, c+1, currentZone, currentOpenings); 
+    modifiedFloodFill(r, c-1, currentZone, currentOpenings); 
+    return true;
   }
+
+  boolean needsGuard() { return (openings.length > numGuards); }
 
   void addSurvivors(int num) {
     // add survivors to this safezone
     for (int i=0; i<num; i++) this.survivors.add(new Civilian(0, this));   // safezones are only outside (outside.ID == 0)
+  }
+
+  void registerDeath(Survivor s) {
+    // essentially just used to check if a guard has died
+
+    for (int i=0; i<openings.length; i++) {
+      if (guards[i] == s) {  // the dying survivor was a guard
+        // remove him from guard list, since he's dying
+        guards[i] = null;
+        numGuards--;
+        break;
+      }
+    }
+  }
+
+  boolean acceptGuard(Survivor g) {
+    //   Takes g as a new guard, gives them an opening
+    // to defend, saves them and sends them to their 
+    // new post. 
+    //   If no openings, ???
+
+    for (int i=0; i<openings.length; i++) {
+      if (guards[i] == null) {  // found a post to guard
+          g.guarding = true;
+          numGuards++;
+          guards[i] = g;
+          g.goToTarget(openings[i].pos, wait);
+          break;
+        
+      }
+    }
+
+    return false;
   }
 }
 
 void loadSafezones() {
   safezones = new ArrayList<Safezone>();
   Tile temp;
-  for (int c=0; c<current.cols; c++) {
+  for (int c  =0; c<current.cols; c++) {
     for (int r=0; r<current.rows; r++) {
       temp = current.map[c][r];
       if (!temp.tagged && temp.safe) {
@@ -87,6 +131,12 @@ void loadSafezones() {
   for (Safezone zone : safezones) {
     for (int i=0; i<zone.spots.length; i++) zone.spots[i].tagged = false;
     for (int i=0; i<zone.openings.length; i++) zone.openings[i].tagged = false;
+
+    zone.addSurvivors(zone.openings.length + 3);
+
+    //for (Survivor s : zone.survivors) {
+     // zone.acceptGuard(s);
+    //}
   }
 }
 

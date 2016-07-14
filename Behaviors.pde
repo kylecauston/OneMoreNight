@@ -167,6 +167,8 @@ class Flee extends Behavior {
     gets the opposite vector (vector away from target), and
     then applies a bit of randomness (as both wander and 
     chase have).
+      Need to add a time-out for flee, causing it to end. 
+    Either time, distance or line of sight. Maybe all three.
   */
   
   Flee() {
@@ -176,7 +178,7 @@ class Flee extends Behavior {
   void update(NPC current) {
     current.speed = current.regularSpeed;
     if (random(1) < 0.01) current.enemy = closestEnemy(current);
-    if (random(1) < 0.05) newTarget(current);
+    if (random(1) < 0.05) this.newTarget(current);
   }
 
   void collide(NPC current) {
